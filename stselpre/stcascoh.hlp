@@ -1,0 +1,112 @@
+.-
+help for ^stcascoh^                                               (STB-59: sbe41) 
+.-
+
+Create a dataset suitable for case-cohort analysis
+--------------------------------------------------
+
+    ^stcascoh^ [varlist] [^if^ exp] [^in^ range] ^, a^lpha^(^#^)^ [ ^gr^oup^(^varnames^)^
+                         ^gen^erate^(^varlist^)^ ^ep^s^(^#^) ^se^ed(#) ^nosh^ow ]
+
+^stcascoh^ is for use with survival-time data; see help @st@. You must ^stset^
+data with an ^id()^ variable before using this command; see help @stset@.
+
+
+Description
+-----------
+
+^stcascoh^ is used to create the appropriate dataset for a case-cohort
+analysis by sampling the cohort at the time of entry (subcohort) and including
+all failures, whether they occur in the random sample or not (nonsubcohort
+cases). To this aim, ^stcascoh^ expands the observations who fail in two
+parts: (1) time interval (t0,t-eps] and (2) time interval (t-eps,t].  The
+following variables are added to the dataset:
+
+^ _subco^    coded  0  for subcohort member with no failure
+                  1  for subcohort members who failed
+                  2  for nonsubcohort cases
+^ _wBarlow^  log-weights of records as in Barlow method 
+^ _wSelPre^  log-weights of records as in Self and Prentice method 
+
+The names of the new variables can be changed by specifying the ^gen()^
+option.  varlist defines the variables to be retained in the final dataset. If
+varlist is not specified, all variables are carried over into the resulting
+dataset.
+
+^stcascoh^ shows two summary tables: the first one describes the subcohort
+membership vs. failure in the cohort; the second displays the risk sets with
+three controls or less to check whether the subcohort becomes small due to
+many failures or censorings.
+
+In the new dataset, nonsubcohort cases cannot rely on the original ^stset^
+declaration.  At the end of the module, ^stset^ is invoked to fix entry and
+exit time to the present _t0 and _t variables.
+
+Randomness in the sampling is obtained using Stata ^uniform()^ function. Seed
+can be specified by a ^seed()^ option. Observations not meeting ^if^ and ^in^
+criteria are dropped even if they fail.
+
+The resulting dataset can be analyzed using ^stselpre^ or ^stcox^.  ^stselpre^
+fits proportional hazards model according with Prentice and Self--Prentice
+methods.  Self--Prentice model based variance is estimated.  When using
+^stcox^, ^robust^ option is needed to estimate the approximate variance as
+proposed by Lin and Ying and Barlow. In this case, analysis can be performed
+using three methods:
+
+1- Prentice: ^stcox varlist, robust^
+2- Self and Prentice: ^stcox varlist, offset(_wSelPre) robust^
+3- Barlow: ^stcox varlist, offset(_wBarlow) robust^
+
+
+Options
+-------
+
+^alpha(^#^)^ specifies the sampling fraction. The sampling fraction can be
+    expressed as real or integer.
+
+^group(^varlist^)^ specifies that the alpha sample is to be drawn within each
+    set of values of varlist, thus maintaining the proportion of each group.
+
+^generate(^varlist^)^ specifies other variable names for three generated variables.
+
+^eps(^#^)^ specifies a typically small number so that a case that is in the
+    risk set at time t is represented in the expanded data by an
+    "infinitesimal" episode (t-eps,t].  ^eps^ should be set to a number that
+    is small compared to the measurement unit of time.  ^eps^ defaults to
+    1E-3.
+
+^seed(^#^)^ specifies seed for random sampling.
+
+^noshow^ prevents ^stcascoh^ from showing the names of the key ^st^ variables.
+
+
+Examples
+--------
+
+        . ^stcascoh, alpha(20)^
+        . ^stcascoh afe yfe ln_exp, alpha(0.3) gen(mycohort) group(race) seed(987654321)^
+
+
+Also see
+--------
+
+ Manual:  ^[R] stcox [R] sttocc^
+On-line:  help for @stcox@ @stselpre@ @sttocc@
+
+
+
+Reference
+---------
+
+Barlow WE, Ichicawa L, Rosner D, and Izumi S: Analysis of Case-Cohort Designs.
+           Journal Clinical Epidemiology 1999; 52: 1165-1172.
+
+
+Author
+------
+
+      Enzo Coviello
+      Unita' di Epidemiologia  e Statistica Az. USL BA/1 
+      70053 Andria (Bari)
+      Italy
+      coviello@@mythnet.it

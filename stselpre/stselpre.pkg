@@ -1,0 +1,6 @@
+D 'stselpre': Fits proportional hazards model to case-cohort data Use stselpre With STATA 19
+D
+F stcascoh.ado
+F stcascoh.hlp
+F stselpre.ado
+F stselpre.hlp
