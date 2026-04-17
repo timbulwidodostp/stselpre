@@ -1,6 +1,8 @@
 # stselpre
 Fits proportional hazards model to case-cohort data Use stselpre With STATA 19
 
+https://www.youtube.com/watch?v=puW6R8jX7ao
+
 Olah Data Semarang
 
 WA: +6285227746673 (085227746673)
